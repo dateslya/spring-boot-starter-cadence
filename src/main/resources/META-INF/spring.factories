@@ -1,0 +1,2 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+da.teslya.spring.boot.cadence.config.CadenceAutoConfiguration
