@@ -13,6 +13,7 @@ public class DefaultRegisterDomainRequestCustomizer implements
     public void accept(RegisterDomainRequest request, DomainProperties props) {
         request
                 .setName(props.getName())
-                .setDescription(props.getDescription());
+                .setDescription(props.getDescription())
+                .setWorkflowExecutionRetentionPeriodInDays(props.getWorkflowExecutionRetentionPeriodInDays());
     }
 }

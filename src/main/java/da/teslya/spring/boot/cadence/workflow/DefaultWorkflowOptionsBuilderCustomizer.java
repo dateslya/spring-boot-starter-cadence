@@ -11,7 +11,6 @@ public class DefaultWorkflowOptionsBuilderCustomizer implements
 
     @Override
     public void accept(Builder builder, WorkflowProperties props) {
-        builder
-                .setTaskList(props.getTaskList());
+
     }
 }

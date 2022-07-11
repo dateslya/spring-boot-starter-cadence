@@ -19,7 +19,7 @@ public class WorkflowServiceConfig {
     @Bean
     public IWorkflowService workflowService() {
 
-        WorkflowServiceProperties props = cadenceProperties.getServices().get("default");
+        WorkflowServiceProperties props = cadenceProperties.getService();
 
         WorkflowServiceTChannel.ClientOptions.Builder builder = new WorkflowServiceTChannel.ClientOptions.Builder();
         new Customizers<>(builderCustomizers).customize(builder, props);

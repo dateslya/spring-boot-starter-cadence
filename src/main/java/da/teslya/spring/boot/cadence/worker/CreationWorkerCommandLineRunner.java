@@ -3,9 +3,10 @@ package da.teslya.spring.boot.cadence.worker;
 import com.uber.cadence.worker.Worker;
 import com.uber.cadence.worker.WorkerOptions;
 import com.uber.cadence.worker.WorkflowImplementationOptions;
-import com.uber.cadence.workflow.WorkflowMethod;
+import da.teslya.spring.boot.cadence.activity.ActivityHolder;
 import da.teslya.spring.boot.cadence.config.CadenceProperties;
 import da.teslya.spring.boot.cadence.config.Customizers;
+import da.teslya.spring.boot.cadence.workflow.WorkflowHolder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeansException;
@@ -13,18 +14,10 @@ import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
-import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
-import org.springframework.util.ReflectionUtils;
 
-import java.lang.reflect.Method;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.function.Consumer;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import java.util.function.BiConsumer;
 
 @Slf4j
 @Order(10)
@@ -43,51 +36,45 @@ public class CreationWorkerCommandLineRunner implements CommandLineRunner, Appli
     }
 
     @Override
-    public void run(String... args) throws Exception {
+    public void run(String... args) {
 
-        WorkerProperties props = cadenceProperties.getWorkers().getOrDefault("default", new WorkerProperties());
-        TaskListProperties taskListProps = cadenceProperties.getTaskLists().get(props.getTaskList());
+        WorkerProperties props = cadenceProperties.getWorker();
 
         WorkerOptions.Builder builder = new WorkerOptions.Builder();
         new Customizers<>(builderCustomizers).customize(builder, props);
 
-        Worker worker = workerFactory.newWorker(taskListProps.getName(), builder.build());
-        findWorkflowInterfaces().forEach(new RegisterWorkflowImplementationFactory(worker, applicationContext));
-//        TODO
-//        worker.registerActivitiesImplementations();
+        Worker worker = workerFactory.newWorker(props.getTaskList(), builder.build());
+        addWorkflowImplementationFactory(worker);
+        registerActivitiesImplementations(worker);
+    }
+
+    private void addWorkflowImplementationFactory(Worker worker) {
+        WorkflowHolder.getInstance().getAll()
+                .forEach(new WorkflowFactoryRegistrar(worker, applicationContext));
+    }
+
+    private void registerActivitiesImplementations(Worker worker) {
+        worker.registerActivitiesImplementations(findActivityBeans());
     }
 
     @RequiredArgsConstructor
-    private static class RegisterWorkflowImplementationFactory<T> implements Consumer<Class<T>> {
+    private static class WorkflowFactoryRegistrar<T> implements BiConsumer<String, Class<T>> {
         private final Worker worker;
         private final ApplicationContext applicationContext;
 
         @Override
-        public void accept(Class<T> workflowInterface) {
+        public void accept(String beanName, Class<T> beanInterfaceType) {
             worker.addWorkflowImplementationFactory(
                     new WorkflowImplementationOptions.Builder().build(),
-                    workflowInterface,
-                    () -> applicationContext.getBean(workflowInterface));
-            log.info("Workflow '{}' successfully registered", workflowInterface);
+                    beanInterfaceType,
+                    () -> (T) applicationContext.getBean(beanName));
+            log.info("Workflow '{}' successfully registered", beanInterfaceType);
         }
     }
 
-    private List<Class<?>> findWorkflowInterfaces() {
-        return Stream.of(applicationContext.getBeanDefinitionNames())
-                .filter(applicationContext::isPrototype)
-                .map(applicationContext::getType)
-                .filter(Objects::nonNull)
-                .map(this::findWorkflowInterface)
-                .filter(Optional::isPresent)
-                .map(Optional::get)
-                .collect(Collectors.toList());
-    }
-
-    private Optional<Class<?>> findWorkflowInterface(Class<?> beanType) {
-        return Stream.of(beanType.getInterfaces())
-                .flatMap(interfaceType -> Stream.of(ReflectionUtils.getAllDeclaredMethods(interfaceType)))
-                .filter(interfaceMethod -> AnnotationUtils.findAnnotation(interfaceMethod, WorkflowMethod.class) != null)
-                .findFirst()
-                .map(Method::getDeclaringClass);
+    private Object[] findActivityBeans() {
+        return ActivityHolder.getInstance().getAll().keySet().stream()
+                .map(applicationContext::getBean)
+                .toArray();
     }
 }

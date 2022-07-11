@@ -7,4 +7,5 @@ public class DomainProperties {
 
     private String name = "default_domain";
     private String description = "Default domain";
+    private int workflowExecutionRetentionPeriodInDays = 1;
 }

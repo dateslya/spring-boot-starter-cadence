@@ -1,47 +1,26 @@
 spring:
   cadence:
-    services:
-      default:
-        host: localhost
-        port: 7933
-    domains:
-      default:
-        name: my_domain_name
-        description: My domain description
-        workflowExecutionRetentionPeriodInDays: 5
-    task-lists:
-      default:
-        name: my_task_list
-        workflows:
-          default:
-            executionStartToCloseTimeout: PT1H
-            workflowIdReusePolicy: RejectDuplicate
-            retry:
-              initialInterval: PT1S
-              expiration: PT5H
-              backoffCoefficient: 1.5D
-              maximumAttempts: 100
-              maximumInterval: PT1M
-              doNotRetry: java.lang.NullPointerException
-          myWorkflow:
-            workflowIdReusePolicy: AllowDuplicate
-        child-workflows:
-          default:
-        activities:
-          default:
-            scheduleToCloseTimeout: PT10M
-            scheduleToStartTimeout: PT5M
-            startToCloseTimeout: PT5M
-            heartbeatTimeout: PT30S
-            retry:
-              initialInterval: PT1S
-              expiration: PT1H
-              backoffCoefficient: 1.5D
-              maximumAttempts: 100
-              maximumInterval: PT30S
-              doNotRetry: java.lang.NullPointerException
-          myActivity:
-            scheduleToCloseTimeout: PT5M
-        local-activities:
-          default:
-            scheduleToCloseTimeout: PT50S
+    service:
+      host: localhost
+      port: 7933
+    domain:
+      name: my_domain
+      description: My domain description
+    worker:
+      task-list: my_task_list
+      workflows:
+        default:
+          executionStartToCloseTimeout: PT1H
+          workflowIdReusePolicy: RejectDuplicate
+        myWorkflow:
+          workflowIdReusePolicy: AllowDuplicate
+      activities:
+        default:
+          scheduleToCloseTimeout: PT10M
+          scheduleToStartTimeout: PT5M
+          startToCloseTimeout: PT5M
+        myActivity:
+          scheduleToCloseTimeout: PT5M
+      local-activities:
+        default:
+          scheduleToCloseTimeout: PT50S

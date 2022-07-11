@@ -23,9 +23,8 @@ public class WorkflowClientConfig {
     @Bean
     public WorkflowClient workflowClient() {
 
-        WorkflowClientProperties props = cadenceProperties.getClients()
-                .getOrDefault("default", new WorkflowClientProperties());
-        DomainProperties domainProps = cadenceProperties.getDomains().get(props.getDomain());
+        WorkflowClientProperties props = cadenceProperties.getClient();
+        DomainProperties domainProps = cadenceProperties.getDomain();
 
         WorkflowClientOptions.Builder builder = new WorkflowClientOptions.Builder();
         new Customizers<>(builderCustomizers).customize(builder, props);

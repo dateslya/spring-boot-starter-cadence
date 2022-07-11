@@ -25,7 +25,7 @@ public class RegisterDomainCommandLineRunner implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
 
-        DomainProperties props = cadenceProperties.getDomains().get("default");
+        DomainProperties props = cadenceProperties.getDomain();
 
         RegisterDomainRequest request = new RegisterDomainRequest();
         new Customizers<>(builderCustomizers).customize(request, props);
