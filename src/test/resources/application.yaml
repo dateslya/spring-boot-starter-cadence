@@ -24,3 +24,6 @@ spring:
       local-activities:
         default:
           scheduleToCloseTimeout: PT50S
+
+template:
+  hello: Hello, %s!

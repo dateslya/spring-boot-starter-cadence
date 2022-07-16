@@ -5,7 +5,7 @@ import com.uber.cadence.client.WorkflowClient;
 import com.uber.cadence.client.WorkflowClientOptions;
 import com.uber.cadence.serviceclient.IWorkflowService;
 import da.teslya.spring.boot.cadence.config.CadenceProperties;
-import da.teslya.spring.boot.cadence.config.Customizers;
+import da.teslya.spring.boot.cadence.config.CustomizersAcceptor;
 import da.teslya.spring.boot.cadence.domain.DomainProperties;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.ObjectProvider;
@@ -27,7 +27,7 @@ public class WorkflowClientConfig {
         DomainProperties domainProps = cadenceProperties.getDomain();
 
         WorkflowClientOptions.Builder builder = new WorkflowClientOptions.Builder();
-        new Customizers<>(builderCustomizers).customize(builder, props);
+        new CustomizersAcceptor<>(builderCustomizers).accept(builder, props);
 
         return WorkflowClient.newInstance(workflowService, domainProps.getName(), builder.build());
     }

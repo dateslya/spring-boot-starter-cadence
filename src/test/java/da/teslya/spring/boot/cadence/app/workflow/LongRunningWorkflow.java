@@ -1,4 +1,4 @@
-package da.teslya.spring.boot.cadence.workflow;
+package da.teslya.spring.boot.cadence.app.workflow;
 
 import com.uber.cadence.workflow.WorkflowMethod;
 

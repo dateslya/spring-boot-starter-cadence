@@ -10,7 +10,7 @@ public class DefaultWorkflowOptionsBuilderCustomizer implements
         WorkflowOptionsBuilderCustomizer {
 
     @Override
-    public void accept(Builder builder, WorkflowProperties props) {
+    public void accept(Builder builder, String name) {
 
     }
 }

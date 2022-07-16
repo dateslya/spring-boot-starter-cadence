@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 @Order(20)
 @Component
 @RequiredArgsConstructor
-public class StartWorkerFactoryCommandLineRunner implements CommandLineRunner {
+public class WorkerFactoryStarter implements CommandLineRunner {
 
     private final Worker.Factory workerFactory;
 

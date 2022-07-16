@@ -6,6 +6,6 @@ import java.util.function.BiConsumer;
 
 @FunctionalInterface
 public interface WorkflowOptionsBuilderCustomizer extends
-        BiConsumer<Builder, WorkflowProperties> {
+        BiConsumer<Builder, String> {
 
 }
