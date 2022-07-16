@@ -1,6 +1,7 @@
 package da.teslya.spring.boot.cadence.config;
 
 import com.uber.cadence.activity.ActivityMethod;
+import com.uber.cadence.activity.ActivityOptions;
 import com.uber.cadence.workflow.Workflow;
 import com.uber.cadence.workflow.WorkflowMethod;
 import da.teslya.spring.boot.cadence.util.ReflectionUtils;
@@ -22,6 +23,7 @@ import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
+import java.time.Duration;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -147,10 +149,11 @@ public class ContextLoader implements BeanDefinitionRegistryPostProcessor, Appli
 
         registry.removeBeanDefinition(beanName);
 
+        ActivityOptions options = new ActivityOptions.Builder().setScheduleToCloseTimeout(Duration.ofSeconds(5)).build();
         GenericBeanDefinition stubBeanDefinition = new GenericBeanDefinition();
         stubBeanDefinition.setBeanClass(activityInterface);
         stubBeanDefinition.setScope(BeanDefinition.SCOPE_PROTOTYPE);
-        stubBeanDefinition.setInstanceSupplier(() -> Workflow.newActivityStub(activityInterface));
+        stubBeanDefinition.setInstanceSupplier(() -> Workflow.newActivityStub(activityInterface, options));
 
         String stubBeanName = beanNameGenerator.generateBeanName(stubBeanDefinition, registry);
 
